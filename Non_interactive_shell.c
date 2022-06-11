@@ -1,29 +1,32 @@
 #include "main.h"
 
 /**
-* main - Entry Point
+* non_interactive_mode - Run the shell in non_interactive mode
+*
+* @argc: No of arguments
+*
+* @argv: Array of arguments
+*
+* @env: Process environment
 *
 * Return: (Always/Success)
 */
 
-int main(int argc, char **argv)
+int non_interactive_mode(int argc, char **argv, char **env)
 {
-	int exec_ret;
-	char *newargv[] = {NULL, NULL};
+	int i, j, exec_ret;
+	char *newargv[1024];
 
-	if (argc > 1)
+	for (i = 0, j = 1; j < argc; i++, j++)
 	{
-		newargv[0] = argv[1];
-		exec_ret = execve(newargv[0], newargv, NULL);
-		if (exec_ret == -1)
-		{
-			perror("Error: command did not execute");
-			return (1);
-		}
+		newargv[i] = argv[j];
 	}
-	else
+
+	exec_ret = execve(newargv[0], newargv, env);
+	if (exec_ret == -1)
 	{
-		printf("This is where I'd run the interactive shell, but I'll do that tomorrow\n");
+		fprintf(stderr,"%s: 1: %s: %s\n", argv[0], newargv[1], strerror(errno));
+		exit (127);
 	}
 
 	return (0);

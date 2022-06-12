@@ -1,55 +1,55 @@
 #include "main.h"
 
 /**
-* main - Entry Point
+* interactive_mode - Runs the shell in interactive mode
+*
+* @parent: The shell
+*
+* @env: The users environment
 *
 * Return: (Always/Success)
 */
 
-int main(void)
+int interactive_mode(char *parent, char **env)
 {
 	pid_t c_pid;
-	int exec_ret, status;
-	char *newargv[] = {NULL, NULL};
-	char command[1024];
-	char *exit_command = "exit";
+	int status, counter = 1;
+	char *command = NULL, *input = NULL;
 
-	while (*command != *exit_command)
+	while (1)
 	{
-		newargv[0] = command;
-
-		printf("$ ");
-		scanf("%s", command);
-
-		if (*command == *exit_command)
+		input = input_prompt();
+		command = format_input(input);
+		/*Builtin checks*/
+		if (command[0] == '\n')
 		{
-			break;
+			free(command);
+			continue;
 		}
 
+		if (check_if_exit(command) == 0)
+			break;
+
+		if (check_if_env(command, env) == 0)
+		{
+			counter++;
+			continue;
+		}
+		/*Create child process*/
 		c_pid = fork();
 		if (c_pid == -1)
 		{
-			perror("Error: Child process not created");
-			return (1);
+			perror(strerror(errno));
+			exit(errno);
 		}
 
-		/*Start of Child*/
 		if (c_pid == 0)
-		{
-			exec_ret = execve(newargv[0], newargv, NULL);
-			if (exec_ret == -1)
-			{
-				perror("Error: command did not execute");
-				return (1);
-			}
-		}
+			execute_command(command, parent, env, counter);
 		else
-		{
 			wait(&status);
-		}
 
+		free(command);
+		counter++;
 	}
-	/*End of child*/
-
 	return (0);
 }

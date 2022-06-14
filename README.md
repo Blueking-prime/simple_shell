@@ -2,12 +2,9 @@
 Repository for the ALX Simple Shell Project
 
 # Updates
-+ Nearly finalized interactive mode
-+ Added env function
-+ Fix exit function
-+ Split code into different functions to reduce bulk
-+ Add AUTHORS file
-
-- PATH still unhandled
-- Non-Interactive mode still doesn't work as intended
-- Arguments not yet handled
++ Finalized interactive mode
++ Fixed bug with env and exit function, where they didn't check to see if the user had only typed the keywords
++ Add PATH functionality
++ Shell now supports arguments
++ Non-Interactive mode now works(to the best of my abilities)
++ Should be ready to ship

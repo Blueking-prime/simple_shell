@@ -51,13 +51,13 @@ int check_if_exit(char *command)
 		}
 	}
 
-	if (i < 4)
+	if (i == 4 && command[i] == '\0')
 	{
-		return (1);
+		return (0);
 	}
 	else
 	{
-		return (0);
+		return (1);
 	}
 }
 
@@ -83,14 +83,14 @@ int check_if_env(char *command, char **env)
 		}
 	}
 
-	if (i < 3)
-	{
-		return (1);
-	}
-	else
+	if (i == 3 && command[i] == '\0')
 	{
 		_printenv(env);
 		return (0);
+	}
+	else
+	{
+		return (1);
 	}
 }
 
@@ -109,9 +109,39 @@ char *format_input(char *command)
 	{
 		if (command[i] == '\n')
 		{
-			command[i] = command[i+1];
+			command[i] = command[i + 1];
 		}
 	}
 
 	return (command);
+}
+
+/**
+* check_path - checks for command in path
+*
+* @command: input command
+*
+* Return: location of file
+*/
+int check_path(char *command)
+{
+	char bin[20] = "/bin/";
+	char sbin[20] = "/sbin/";
+	struct stat st;
+
+	strcat(bin, command);
+	strcat(sbin, command);
+
+	if (stat(command, &st) == 0)
+	{
+		return (0);
+	} else if (stat(bin, &st) == 0)
+	{
+		return (1);
+	} else if (stat(sbin, &st) == 0)
+	{
+		return (2);
+	}
+
+	return (0);
 }

@@ -12,43 +12,42 @@
 
 int interactive_mode(char *parent, char **env)
 {
-	pid_t c_pid;
-	int status, counter = 1;
-	char *command = NULL, *input = NULL;
+	int counter = 1, path_check;
+	char **command = NULL, *input = NULL, *ppath = NULL;
+	char bin[20];
+	char sbin[20];
 
 	while (1)
 	{
 		input = input_prompt();
-		command = format_input(input);
-		/*Builtin checks*/
-		if (command[0] == '\n')
+		ppath = format_input(input);
+		if (ppath[0] == '\n')
 		{
-			free(command);
+			free(ppath);
 			continue;
 		}
-
-		if (check_if_exit(command) == 0)
+		if (check_if_exit(ppath) == 0)
 			break;
-
-		if (check_if_env(command, env) == 0)
+		if (check_if_env(ppath, env) == 0)
 		{
 			counter++;
 			continue;
 		}
-		/*Create child process*/
-		c_pid = fork();
-		if (c_pid == -1)
+		command = arg_split(ppath);
+		path_check = check_path(command[0]);
+		if (path_check == 0)
+			command[0] = ppath;
+		else if (path_check == 1)
 		{
-			perror(strerror(errno));
-			exit(errno);
+			strcpy(bin, "/bin/");
+			command[0] = strcat(bin, ppath);
 		}
-
-		if (c_pid == 0)
-			execute_command(command, parent, env, counter);
-		else
-			wait(&status);
-
-		free(command);
+		else if (path_check == 2)
+		{
+			strcpy(sbin, "/sbin/");
+			command[0] = strcat(sbin, ppath);
+		}
+		fork_and_exec(command, parent, env, counter);
 		counter++;
 	}
 	return (0);

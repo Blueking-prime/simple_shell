@@ -3,6 +3,12 @@
 /**
 * main - Entry Point
 *
+* @argc: No of arguments
+*
+* @argv: Array of arguments
+*
+* @env: Process environment
+*
 * Return: (Always/Success)
 */
 

@@ -3,31 +3,49 @@
 /**
 * non_interactive_mode - Run the shell in non_interactive mode
 *
-* @argc: No of arguments
+* @ac: No of arguments
 *
-* @argv: Array of arguments
+* @av: Array of arguments
 *
 * @env: Process environment
 *
 * Return: (Always/Success)
 */
 
-int non_interactive_mode(int argc, char **argv, char **env)
+int non_interactive_mode(int ac, char **av, char **env)
 {
-	int i, j, exec_ret;
-	char *newargv[1024];
+	int i, j;
+	int counter = 1, path_check;
+	char **command = malloc(sizeof(av) + (7 * sizeof(char)));
+	char bin[20];
+	char sbin[20];
 
-	for (i = 0, j = 1; j < argc; i++, j++)
+	for (i = 0, j = 1; j < ac; i++, j++)
 	{
-		newargv[i] = argv[j];
+		command[i] = av[j];
 	}
 
-	exec_ret = execve(newargv[0], newargv, env);
-	if (exec_ret == -1)
+	if (check_if_exit(av[1]) == 0)
+		return (0);
+
+	check_if_env(av[1], env);
+
+	path_check = check_path(command[0]);
+	if (path_check == 0)
+		command[0] = av[1];
+
+	else if (path_check == 1)
 	{
-		fprintf(stderr,"%s: 1: %s: %s\n", argv[0], newargv[1], strerror(errno));
-		exit (127);
+		strcpy(bin, "/bin/");
+		command[0] = strcat(bin, av[1]);
 	}
+	else if (path_check == 2)
+	{
+		strcpy(sbin, "/sbin/");
+		command[0] = strcat(sbin, av[1]);
+	}
+
+	fork_and_exec(command, av[0], env, counter);
 
 	return (0);
 }

@@ -1,4 +1,5 @@
-#Pragma Once
+#ifndef MAIN_H
+#define MAIN_H
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -57,3 +58,4 @@ int exit_status);
 void help_(char **array_buf, char *buf, char *path_str, char **array_path,
 int exit_status);
 
+#endif
